@@ -1,3 +1,5 @@
+
+ 
 import mongoose from "mongoose";
 
 export async function connectToDb(callback) {
@@ -18,6 +20,7 @@ export async function connectToDb(callback) {
             callback();
         }
 
+        console.log('Verbindung zu MongoDB Atlas hergestellt');
     } catch (error) {
         console.error(error);
     }

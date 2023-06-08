@@ -1,5 +1,4 @@
-
-
+ 
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -9,12 +8,14 @@ import vehicleRouter from './routes/vehicle.route.js';
  import reservationsRouter from './routes/reservations.route.js';
  import bookingRouter from './routes/booking.route.js';
 import { startBackgroundTasks } from './backgroundtasks/ backgroundTasks.js';
-import paymentRouter from "./routes/payment.route.js";
-import vehicleCountsRouter from './routes/vehicleCounts.route.js';
-import paymentSuccessRouter from './routes/payment-success.route.js';
-import paymentWebhookRouter from './routes/paymentWebhook.route.js';
 import { seedRoles } from './model/role.model.js';
 import * as MailService from './service/mail.service.js';
+/* import { newReservation } from './controller/reservationsController.js';
+ *//* import { addVehicles } from './controllers/vehicleController';
+ */
+import {showAvailableVehicleCounts} from './controller/vehicle.add.js';
+
+
 //-------------------------------------------------------------------------------------
 dotenv.config();
 
@@ -37,13 +38,13 @@ app.use(cors({
 
 // Middleware fuer CROSS-ORIGIN-REQUEST
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (corsWhitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+    origin: function (origin, callback) {
+      if (corsWhitelist.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
 };
 
 app.use(cors(corsOptions));
@@ -51,17 +52,19 @@ app.use(cors(corsOptions));
 
 // --------------------- ROUTES -------------------------
 app.use('/auth', authRouter);
-app.use('/vehicles/:vehicleId', vehicleRouter);
 app.use('/vehicles', vehicleRouter);
 app.use('/reservations', reservationsRouter);
 app.use('/booking', bookingRouter);
-app.use('/payment', paymentRouter);
-app.use('/api/vehicleCounts', vehicleCountsRouter);
-app.use('/payment/payment-update', paymentSuccessRouter);
-app.use('/payment/webhook', paymentWebhookRouter);
 
 //die Fahrzeugtypen und die verfügbare Menge jedes Fahrzeugs zurückzugeben:
-
+app.get('/api/vehicleCounts', async (req, res) => {
+  const vehicleCounts = await showAvailableVehicleCounts();
+  const vehicleCountsMap = vehicleCounts.reduce((acc, count) => {
+    acc[count._id] = count.count;
+    return acc;
+  }, {});
+  res.json(vehicleCountsMap);
+}); 
 
 // Einmalig Verbindung ueber default Connection aufbauen
 // Uebergebe Seeding-Funktion zum Einfuegen von Userrollen

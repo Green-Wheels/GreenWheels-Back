@@ -17,4 +17,3 @@ export default paymentSuccessRouter;
 // Die redirectUrl ist die URL, zu der der Benutzer nach einer erfolgreichen Zahlung weitergeleitet wird. 
 // Sie sollten eine Route in Ihrer Anwendung erstellen, die den Erfolg der Zahlung anzeigt und alle erforderlichen Schritte ausführt, wie 
 // z. B. das Aktualisieren der Reservierungsinformationen oder das Senden einer Bestätigungsnachricht an den Benutzer.
-

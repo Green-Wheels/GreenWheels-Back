@@ -1,76 +1,44 @@
-
+ 
 import mongoose from "mongoose";
 import * as RoleModel from './role.model.js';
 
-// Definiere Todo Schema
+// Definiere User Schema
 const userSchema = mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-        isLength: {
-            options: {
-                min: 5,
-                max: 10
-            },
-            errorMessage: 'Username must have a length of 5 to 10'
-        }
-    },
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    fullname: { type: String, required: true },
+    city: { type: String },
+    role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
+    lastLogin:{ type: Date},
+    emailHash: { type: String },
+}, { timestamps: true });
 
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-
-    password: {
-        type: String,
-        required: true,
-        isLength: {
-            options: {
-                min: 8,
-                max: 30
-            },
-            errorMessage: 'Password must have a length of 8 to 30'
-        }
-    },
-
-    fullname: {
-        type: String,
-        required: true
-    },
-
-    city: {
-        type: String
-    },
-
-    role: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Role'
-    },
-
-    emailHash: {
-        type: String
-    }
-
-},
-
-    { timestamps: true });
-
-
+ 
+ 
+ 
 // Erstelle ein neues Model Objekt fuer User
 // Erstellt automatisch users Collection in der MongoDB, wenn noch nicht vorhanden
 const User = mongoose.model('User', userSchema);
+
 // DB-Funktion zum Abrufen eines bestimmten User-Eintrags per username
+// export async function findUserByUsername(username) {
+//     let user = await User.findOne({username: username}).populate('role');
+//     user.lastLogin = Date.now();
+//     await user.save();
+//     return user;
+// }
+
 export async function findUserByUsername(username) {
-    return await User.findOne({ username: username }).populate('role');
-}
-
-// DB-Funktion zum Abrufen eines bestimmten User-Eintrags per username
-export async function findUserById(id) {
-    return await User.findOne({ id }).populate('role');
-}
-
+    try {
+      let user = await User.findOne({username: username}).populate('role');
+      user.lastLogin = Date.now();
+      await user.save();
+      return user;
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
 // DB-Funktion zum Erstellen eines neuen User-Eintrags
 export async function insertNewUser(userBody) {
@@ -89,7 +57,7 @@ export async function insertNewUser(userBody) {
 
     } catch (error) {
         // Pruefe, ob Conflict durch Dupletten-Verletzung
-        if ((error.hasOwnProperty('code')) && (error.code === 11000)) {
+        if ( (error.hasOwnProperty('code')) && (error.code === 11000) ) {
             // Schmeisse entsprechendes Fehlerobjekt
             throw {
                 code: 409,
@@ -114,13 +82,14 @@ export async function getAll() {
 
 
 export async function getByEmailHash(hash) {
-    return await User.findOne({ emailHash: hash });
+    return await User.findOne({emailHash: hash});
 }
 
 // Setze User per ID auf Rolle "user"
 export async function setVerified(id) {
     const user = await User.findById(id);
 
+    // TODO pruefe existenz
     
 
     const userRole = await RoleModel.findByName(RoleModel.rolesEnum.user);
@@ -134,7 +103,7 @@ export async function setVerified(id) {
 
 // Ueberschreibe mailHash fuer User Eintrag, der mittels email Adresse gefunden wird
 export async function updateEmailHash(email, hash) {
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({email: email});
 
     if (user === null) throw {
         code: 404,
@@ -144,11 +113,4 @@ export async function updateEmailHash(email, hash) {
     user.emailHash = hash;
 
     await user.save();
-}
- // DB-Funktion zum Erstellen eines neuen Admin-Eintrags
-export async function insertNewAdmin(userBody) {
-    const role = await RoleModel.findByName(RoleModel.rolesEnum.admin);
-    userBody.role = role._id;
-    const newAdmin = new User(userBody);
-    return await newAdmin.save();
 }

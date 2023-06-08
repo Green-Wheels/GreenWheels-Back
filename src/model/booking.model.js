@@ -13,17 +13,22 @@ const bookingSchema = new Schema({
     type: Date,
     required: true,
   },
-  
+  // das Datum, an dem die Buchung endet
+  isBooked: {
+    type: Boolean,
+    default: false,
+  },
   bookingId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Booking',
     require: true,
   },
-  vehicle: {
+  // ein Array von Referenzen auf die E-Mobility-Geräte, die der Benutzer bucht
+  vehicle: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Vehicle',
     required: true,
-  },
+  }],
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -32,11 +37,12 @@ const bookingSchema = new Schema({
     type: Number,
     required: true,
   },
-
+  status: {
+    type: String,
+  }
 
 });
 
 const Booking = mongoose.model('Booking', bookingSchema);
 
 export default Booking;
-
