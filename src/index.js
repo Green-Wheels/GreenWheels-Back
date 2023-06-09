@@ -27,24 +27,19 @@ const app = express();
 
 const corsWhitelist = process.env.CORS_WHITELIST.split(",");
 
-// Middleware fuer das body-Parsing
-app.use(express.json());
+// fügen Sie die URL Ihrer gehosteten Frontend-App zur Liste der erlaubten Origin hinzu
+corsWhitelist.push('https://g5-greenwheels.onrender.com');
 
-// Middleware fuer CROSS-ORIGIN-REQUEST
-app.use(cors({
-  origin: 'http://localhost:5173',
-  // credentials: true
-}));
 
 // Middleware fuer CROSS-ORIGIN-REQUEST
 const corsOptions = {
-    origin: function (origin, callback) {
-      if (corsWhitelist.indexOf(origin) !== -1 || !origin) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+  origin: function (origin, callback) {
+    if (corsWhitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
 };
 
 app.use(cors(corsOptions));
