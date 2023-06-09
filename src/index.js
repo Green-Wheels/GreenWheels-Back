@@ -10,10 +10,11 @@ import vehicleRouter from './routes/vehicle.route.js';
 import { startBackgroundTasks } from './backgroundtasks/ backgroundTasks.js';
 import { seedRoles } from './model/role.model.js';
 import * as MailService from './service/mail.service.js';
+import vehicleCountsRouter from './routes/vehicleCounts.route.js';
+
 /* import { newReservation } from './controller/reservationsController.js';
  *//* import { addVehicles } from './controllers/vehicleController';
  */
-import {showAvailableVehicleCounts} from './controller/vehicle.add.js';
 
 
 //-------------------------------------------------------------------------------------
@@ -50,6 +51,7 @@ app.use('/auth', authRouter);
 app.use('/vehicles', vehicleRouter);
 app.use('/reservations', reservationsRouter);
 app.use('/booking', bookingRouter);
+app.use('/api/vehicleCounts', vehicleCountsRouter);
 
 
 await connectToDb(seedRoles);
@@ -58,5 +60,5 @@ startBackgroundTasks();
 // ----------------------------------------------------------
 
 app.listen(process.env.API_PORT, () => {
-    console.log("Server is listening on https://g5-greenwheels-backend-2ilc.onrender.com");
+    console.log('Server is listening on https://g5-greenwheels-backend-2ilc.onrender.com');
 });
