@@ -29,7 +29,7 @@ const app = express();
 const corsWhitelist = process.env.CORS_WHITELIST.split(",");
 
 // fügen Sie die URL Ihrer gehosteten Frontend-App zur Liste der erlaubten Origin hinzu
-corsWhitelist.push('https://g5-greenwheels.onrender.com');
+corsWhitelist.push('https://greenwheels-with-react.onrender.com');
 
 
 // Middleware fuer CROSS-ORIGIN-REQUEST
@@ -43,8 +43,11 @@ const corsOptions = {
   },
 };
 
-app.use(cors(corsOptions));
-
+/* app.use(cors(corsOptions));
+ */
+app.use(cors({
+  origin: 'https://greenwheels-with-react.onrender.com'
+}));
 
 // --------------------- ROUTES -------------------------
 app.use('/auth', authRouter);
