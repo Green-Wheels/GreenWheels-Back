@@ -51,23 +51,12 @@ app.use('/vehicles', vehicleRouter);
 app.use('/reservations', reservationsRouter);
 app.use('/booking', bookingRouter);
 
-//die Fahrzeugtypen und die verfügbare Menge jedes Fahrzeugs zurückzugeben:
-app.get('/api/vehicleCounts', async (req, res) => {
-  const vehicleCounts = await showAvailableVehicleCounts();
-  const vehicleCountsMap = vehicleCounts.reduce((acc, count) => {
-    acc[count._id] = count.count;
-    return acc;
-  }, {});
-  res.json(vehicleCountsMap);
-}); 
 
-// Einmalig Verbindung ueber default Connection aufbauen
-// Uebergebe Seeding-Funktion zum Einfuegen von Userrollen
 await connectToDb(seedRoles);
 // Start background tasks
 startBackgroundTasks();
 // ----------------------------------------------------------
 
 app.listen(process.env.API_PORT, () => {
-    console.log(`Server is listening on http://localhost:${process.env.API_PORT}`);
+    console.log("Server is listening on https://g5-greenwheels-backend-2ilc.onrender.com");
 });
