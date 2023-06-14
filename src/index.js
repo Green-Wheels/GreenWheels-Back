@@ -12,10 +12,6 @@ import { seedRoles } from './model/role.model.js';
 import * as MailService from './service/mail.service.js';
 import vehicleCountsRouter from './routes/vehicleCounts.route.js';
 
-/* import { newReservation } from './controller/reservationsController.js';
- *//* import { addVehicles } from './controllers/vehicleController';
- */
-
 
 //-------------------------------------------------------------------------------------
 dotenv.config();
@@ -43,10 +39,9 @@ const corsOptions = {
   },
 };
 
-/* app.use(cors(corsOptions));
- */
+
 app.use(cors({
-  origin: 'https://greenwheels-with-react.onrender.com'
+  corsOptions
 }));
 
 // --------------------- ROUTES -------------------------
