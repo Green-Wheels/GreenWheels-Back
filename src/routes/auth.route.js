@@ -19,8 +19,8 @@ authRouter.route('/verify')
     .post(verifyEmail)
     .put(refreshNewVerification);
 
-authRouter.route("/auth")
-    .get(verifyToken, loadUser);
+/* authRouter.route("/auth")
+    .get(verifyToken, loadUser); */
 
 authRouter.route('/register-admin')
     .post(verifyToken);
