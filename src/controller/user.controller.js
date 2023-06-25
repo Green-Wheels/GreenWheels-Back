@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import md5 from 'md5';
+
 import * as UserModel from "../model/user.model.js";
 import { rolesEnum } from '../model/role.model.js';
 import * as MailService from '../service/mail.service.js';
@@ -16,6 +17,7 @@ function isValidEmail(email) {
 export async function registerNewUser(req, res) {
   try {
     let body = req.body;
+    console.log(body.password);
     // Überprüfe, ob das Passwort mindestens 8 Zeichen lang ist
     if (body.password.length < 8) {
       res.status(400).json({
@@ -66,7 +68,6 @@ export async function login(req, res) {
   let { username, password } = req.body;
   // Hole entsprechenden User per username aus der DB
   let user = await UserModel.findUserByUsername(username);
-  
   // Wenn user nicht gefunden wurde
   if (user === null) {
     // Sende 401 (UNAUTHORIZED) mit Nachricht
@@ -81,7 +82,7 @@ export async function login(req, res) {
   if (bcrypt.compareSync(password, user.password)) {
     // Erstelle neuen JWT Token mit payload und Verfall nach einer Stunde (60 Minuten * 60 Sekunden)
     let token = jwt.sign(
-      { userId: user._id, fullname: user.fullname, username: user.username, email: user.email, role: user.role },
+      { userId: user._id, username: user.username, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: 60 * 600 }
     );
@@ -96,7 +97,6 @@ export async function login(req, res) {
       email: user.email,
       fullname: user.fullname,
       token: token,
-      role: user.role
     });
   } else {
     // Passwort falsch -> Sende Fehlermeldung zurueck
@@ -106,39 +106,8 @@ export async function login(req, res) {
     });
   }
 }
-
-export default async  function loadUser(req, res) {
-  let username = req.tokenPayload.username;
-  let user = await  UserModel.findUserByUsername(username);
-
-
-   // Wenn user nicht gefunden wurde
-   if (user === null) {
-    // Sende 401 (UNAUTHORIZED) mit Nachricht
-    res.status(401).send({
-      success: false,
-      message: "Incorrect username or password",
-    });
-    // early return
-    return;
-  }
-
-  let token = req.headers.authorization.split(" ")[1];
-
-  // Sende Erfolgsnachricht sowie neuen Token zurueck
-  res.send({
-    success: true,
-    message: `User ${user.username} logged in successfully!`,
-    id: user._id,
-    username: user.username,
-    email: user.email,
-    fullname: user.fullname,
-    token: token,
-    role: user.role
-  });
-
-
-
+export default function loadUser(req, res) {
+  res.send(req.tokenPayload);
 }
 
 
@@ -159,7 +128,7 @@ export async function verifyEmail(req, res) {
         // Redirect auf entsprechende Frontend-Page
         // res.redirect('https://bing.com');
         res.status(401).send({
-            redirectTo: 'http://localhost:5173/login', // ?????
+            redirectTo: 'https://greenwheels-with-react.onrender.com/login', // ?????
             message: 'E-Mail verification token invalid'
         });
         // Early return
@@ -214,21 +183,3 @@ export async function refreshNewVerification(req, res) {
 export async function getAllUsers(req, res) {
     res.send(await UserModel.getAll());
 }
-
-export async function addNewAdmin (req, res) {
-  let body = req.body;
-
-  // TODO: Validierungen hier...
-
-  body.password = bcrypt.hashSync(body.password, 10);
-  try {
-    await UserModel.insertNewAdmin(body);
-    res.status(201).json({ success: true });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
-  }
-};
